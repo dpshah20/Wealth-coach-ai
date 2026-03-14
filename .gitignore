@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Flask instance folder (contains database)
+instance/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# VSCode settings
+.vscode/
+
+# Documents you don't want on GitHub
+PRD.md
+UserStories.md
+README.md

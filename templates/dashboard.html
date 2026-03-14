@@ -1,0 +1,636 @@
+{% extends "base.html" %}
+
+{% block title %}ARIA Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+
+    <!-- ====== HEADER ====== -->
+    <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+                   background: rgba(6,6,18,0.92); backdrop-filter: blur(12px);
+                   border-bottom: 1px solid var(--border); padding: 0.875rem 1.5rem;">
+        <div style="max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 32px; height: 32px; border-radius: 50%;
+                            background: linear-gradient(135deg, #7C3AED, #D97706);
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 15px; box-shadow: 0 0 12px rgba(124,58,237,0.4);">✨</div>
+                <span style="font-weight: 800; font-size: 1.15rem;" class="brand-gradient">ARIA</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted); border: 1px solid var(--border);
+                             padding: 0.15rem 0.5rem; border-radius: 4px;">Wealth Mentor</span>
+            </div>
+            <nav style="display: flex; gap: 0.5rem; align-items: center;">
+                <button class="tab-btn active" id="tab-chat" onclick="switchTab('chat')">💬 Chatbot</button>
+                <button class="tab-btn" id="tab-calc" onclick="switchTab('calc')">📈 Calculator</button>
+            </nav>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="user-label" style="font-size: 0.8rem; color: var(--text-muted);"></span>
+                <a href="/logout" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;
+                                         border: 1px solid var(--border); padding: 0.3rem 0.75rem; border-radius: 6px;
+                                         transition: all 0.2s;"
+                   onmouseover="this.style.color='var(--purple-light)'; this.style.borderColor='var(--purple)';"
+                   onmouseout="this.style.color='var(--text-muted)'; this.style.borderColor='var(--border)';">
+                    Sign out
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <div style="padding-top: 5rem; padding-bottom: 3rem; max-width: 1100px; margin: 0 auto; padding-left: 1.25rem; padding-right: 1.25rem;">
+
+        <!-- ====== CHAT TAB ====== -->
+        <div id="panel-chat" style="display: grid; grid-template-columns: 1fr 280px; gap: 1.25rem;">
+
+            <!-- Chat Main -->
+            <div class="card" style="display: flex; flex-direction: column; height: 76vh; min-height: 500px; overflow: hidden;">
+
+                <!-- Chat header -->
+                <div style="padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%;
+                                background: linear-gradient(135deg, #7C3AED, #D97706);
+                                display: flex; align-items: center; justify-content: center; font-size: 16px;
+                                box-shadow: 0 0 12px rgba(124,58,237,0.35); flex-shrink: 0;">✨</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.95rem;">ARIA</div>
+                        <div style="font-size: 0.72rem; color: var(--emerald-light); display: flex; align-items: center; gap: 0.3rem;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--emerald-light); display: inline-block;"></span>
+                            Online · Ready to help
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div id="chat-messages" class="chat-messages" style="flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem;"></div>
+
+                <!-- Typing indicator (hidden) -->
+                <div id="typing-indicator" style="display: none; padding: 0 1.5rem 0.5rem;">
+                    <div class="msg-aria">
+                        <div class="aria-avatar">✨</div>
+                        <div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+                    </div>
+                </div>
+
+                <!-- Input -->
+                <div style="padding: 1rem 1.25rem; border-top: 1px solid var(--border); flex-shrink: 0; display: flex; gap: 0.6rem;">
+                    <input type="text" id="chat-input" class="input-base"
+                           placeholder="Ask ARIA anything about investing..."
+                           onkeypress="if(event.key==='Enter') sendMessage()"
+                           style="flex: 1;" />
+                    <button class="btn-primary" onclick="sendMessage()" id="send-btn"
+                            style="padding: 0.7rem 1.2rem; white-space: nowrap;">Send →</button>
+                </div>
+            </div>
+
+            <!-- Sidebar: Quick Questions -->
+            <div>
+                <div class="card" style="padding: 1.25rem; margin-bottom: 1rem;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.875rem;">Quick Questions</div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button class="quick-chip" style="text-align: left; border-radius: 8px; width: 100%;"
+                                onclick="quickAsk('What is SIP and how does it work?')">What is SIP?</button>
+                        <button class="quick-chip" style="text-align: left; border-radius: 8px; width: 100%;"
+                                onclick="quickAsk('Why should I choose mutual funds over FD?')">Mutual Fund vs FD?</button>
+                        <button class="quick-chip" style="text-align: left; border-radius: 8px; width: 100%;"
+                                onclick="quickAsk('Explain compounding in simple terms')">What is compounding?</button>
+                        <button class="quick-chip" style="text-align: left; border-radius: 8px; width: 100%;"
+                                onclick="quickAsk('Why do I need an emergency fund before investing?')">Emergency fund?</button>
+                        <button class="quick-chip" style="text-align: left; border-radius: 8px; width: 100%;"
+                                onclick="quickAsk('What is index fund investing?')">What is index fund?</button>
+                        <button class="quick-chip" style="text-align: left; border-radius: 8px; width: 100%;"
+                                onclick="quickAsk('How do I start investing with small amounts?')">Start with small amount?</button>
+                    </div>
+                </div>
+
+                <!-- Profile card -->
+                <div class="card" style="padding: 1.25rem;" id="profile-card">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.875rem;">Your Profile</div>
+                    <div id="profile-info" style="font-size: 0.85rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.5rem;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== CALCULATOR TAB ====== -->
+        <div id="panel-calc" style="display: none;">
+
+            <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.25rem; align-items: start;">
+
+                <!-- Controls -->
+                <div class="card" style="padding: 1.5rem; position: sticky; top: 5.5rem;">
+                    <div style="font-weight: 700; font-size: 1rem; margin-bottom: 1.25rem;" class="brand-gradient">SIP Calculator</div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <label style="font-size: 0.82rem; color: var(--text-muted);">Monthly Investment</label>
+                                <span id="monthly-display" style="font-weight: 700; color: var(--purple-light); font-size: 0.9rem;">₹5,000</span>
+                            </div>
+                            <input type="range" id="calc-monthly" min="500" max="50000" step="500" value="5000" oninput="onSliderChange()">
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <label style="font-size: 0.82rem; color: var(--text-muted);">Annual Return</label>
+                                <span id="return-display" style="font-weight: 700; color: var(--purple-light); font-size: 0.9rem;">12%</span>
+                            </div>
+                            <input type="range" id="calc-return" min="4" max="20" step="0.5" value="12" oninput="onSliderChange()">
+                        </div>
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <label style="font-size: 0.82rem; color: var(--text-muted);">Years</label>
+                                <span id="years-display" style="font-weight: 700; color: var(--purple-light); font-size: 0.9rem;">10 yrs</span>
+                            </div>
+                            <input type="range" id="calc-years" min="1" max="30" value="10" oninput="onSliderChange()">
+                        </div>
+                    </div>
+
+                    <!-- Summary stats -->
+                    <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Invested</div>
+                            <div class="stat-value purple" id="summary-invested">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Portfolio Value</div>
+                            <div class="stat-value emerald" id="summary-portfolio">—</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Compounding Gain</div>
+                            <div class="stat-value gold" id="summary-gain">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts & insight -->
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+                    <!-- Growth chart -->
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 1rem; color: var(--text-primary);">📈 Compounding Growth</div>
+                        <canvas id="growth-chart" height="200"></canvas>
+                    </div>
+
+                    <!-- Delay cost chart -->
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">💸 The Cost of Waiting</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">What if you start 5 years later?</div>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <span class="scenario-a">Start Today</span>
+                                <span class="scenario-b">Start After 5 Yrs</span>
+                            </div>
+                        </div>
+
+                        <canvas id="delay-chart" height="200"></canvas>
+
+                        <!-- Scenario comparison -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 1.25rem;">
+                            <div class="stat-card" style="text-align: center;">
+                                <div class="stat-label">Start Today</div>
+                                <div class="stat-value emerald" id="delay-final-a">—</div>
+                            </div>
+                            <div class="stat-card" style="text-align: center;">
+                                <div class="stat-label">Start After 5 Yrs</div>
+                                <div class="stat-value red" id="delay-final-b">—</div>
+                            </div>
+                            <div class="stat-card" style="text-align: center;">
+                                <div class="stat-label">Wealth Lost</div>
+                                <div class="stat-value gold" id="delay-wealth-lost">—</div>
+                            </div>
+                        </div>
+
+                        <!-- ARIA delay insight -->
+                        <div class="aria-insight" id="delay-insight" style="margin-top: 1rem; display: none;">
+                            <div class="icon">✨</div>
+                            <p id="delay-insight-text"></p>
+                        </div>
+                    </div>
+
+                    <!-- Product storytelling card -->
+                    <div class="aria-insight">
+                        <div class="icon">💡</div>
+                        <p>Most people think they need a large amount to start investing. Consistency beats amount — every time. A small start today beats a big start "someday."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+//  GLOBAL STATE
+// ============================================================
+let userProfile  = null;
+let growthChart  = null;
+let delayChart   = null;
+let isChatBusy   = false;
+const chatHistory = [];
+
+// ============================================================
+//  INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    const profileRes  = await fetch('/api/user/profile');
+    const profileData = await profileRes.json();
+    userProfile = profileData.profile;
+
+    // Restore persisted UI/session state for returning users.
+    try {
+        const sessionRes = await fetch('/api/user/session');
+        if (sessionRes.ok) {
+            const sessionPayload = await sessionRes.json();
+            const sessionData = sessionPayload.session_data || {};
+            if (sessionData.active_tab === 'calc') {
+                switchTab('calc');
+            }
+            if (sessionData.calculator_inputs) {
+                const ci = sessionData.calculator_inputs;
+                if (ci.monthly_amount) document.getElementById('calc-monthly').value = ci.monthly_amount;
+                if (ci.annual_return) document.getElementById('calc-return').value = ci.annual_return;
+                if (ci.years) document.getElementById('calc-years').value = ci.years;
+            }
+        }
+    } catch (e) {
+        console.warn('Session restore failed:', e);
+    }
+
+    // Header label
+    const riskLabel = { low: '🛡️ Conservative', medium: '⚖️ Balanced', high: '🚀 Aggressive' };
+    document.getElementById('user-label').textContent = riskLabel[userProfile.risk_tolerance] || 'Investor';
+
+    // Profile card
+    const pi = document.getElementById('profile-info');
+    pi.innerHTML = `
+        <div>🎯 <strong style="color:var(--text-primary)">${userProfile.investment_goals || 'Wealth building'}</strong></div>
+        <div>💰 ₹${Number(userProfile.monthly_surplus).toLocaleString()}/month</div>
+        <div>⏱️ ${userProfile.investment_horizon} year horizon</div>
+        <div>📊 ${riskLabel[userProfile.risk_tolerance] || 'Balanced'} risk</div>
+    `;
+
+    await loadChatHistory();
+    initCalculator();
+});
+
+// ============================================================
+//  TAB SWITCHING
+// ============================================================
+function switchTab(tab) {
+    document.getElementById('panel-chat').style.display = tab === 'chat' ? 'grid' : 'none';
+    document.getElementById('panel-calc').style.display = tab === 'calc' ? 'block' : 'none';
+    document.getElementById('tab-chat').className = 'tab-btn' + (tab === 'chat' ? ' active' : '');
+    document.getElementById('tab-calc').className = 'tab-btn' + (tab === 'calc' ? ' active' : '');
+
+    fetch('/api/user/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active_tab: tab })
+    }).catch(() => {});
+}
+
+// ============================================================
+//  CHAT
+// ============================================================
+async function loadChatHistory() {
+    const res  = await fetch('/api/chat/history');
+    const data = await res.json();
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '';
+    if (data.history && data.history.length) {
+        data.history.forEach(msg => renderMessage(msg.role, msg.content));
+    }
+    scrollChatBottom();
+}
+
+function renderMessage(role, content) {
+    const container = document.getElementById('chat-messages');
+    const wrap = document.createElement('div');
+
+    if (role === 'user') {
+        wrap.className = 'msg-user';
+        wrap.innerHTML = `<div class="bubble">${escapeHtml(content)}</div>`;
+    } else {
+        wrap.className = 'msg-aria';
+        wrap.innerHTML = `
+            <div class="aria-avatar">✨</div>
+            <div class="bubble">${parseARIAResponse(content)}</div>
+        `;
+    }
+    container.appendChild(wrap);
+}
+
+async function sendMessage() {
+    const input   = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (!message || isChatBusy) return;
+
+    isChatBusy = true;
+    input.value = '';
+    input.disabled = true;
+    document.getElementById('send-btn').disabled = true;
+
+    renderMessage('user', message);
+    scrollChatBottom();
+
+    const indicator = document.getElementById('typing-indicator');
+    indicator.style.display = 'block';
+    scrollChatBottom();
+
+    try {
+        const res  = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+        indicator.style.display = 'none';
+        renderMessage('assistant', data.response);
+        scrollChatBottom();
+    } catch (err) {
+        indicator.style.display = 'none';
+        renderMessage('assistant', 'Sorry, something went wrong. Please try again in a moment.');
+    } finally {
+        isChatBusy = false;
+        input.disabled = false;
+        document.getElementById('send-btn').disabled = false;
+        input.focus();
+    }
+}
+
+function quickAsk(text) {
+    document.getElementById('chat-input').value = text;
+    sendMessage();
+}
+
+function scrollChatBottom() {
+    const c = document.getElementById('chat-messages');
+    setTimeout(() => { c.scrollTop = c.scrollHeight; }, 80);
+}
+
+// ============================================================
+//  ARIA RESPONSE PARSER
+//  Converts plain-text markdown-like format → rich HTML
+// ============================================================
+function parseARIAResponse(text) {
+    // Split into lines
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (!lines.length) return escapeHtml(text);
+
+    let hook        = '';
+    const bodyLines = [];
+    const bullets   = [];
+    let followup    = '';
+    let disclaimer  = '';
+
+    lines.forEach((line, i) => {
+        // Disclaimer line
+        if (line.includes('educational only') || line.includes('📌') || line.toLowerCase().includes('not personal financial')) {
+            disclaimer = line;
+            return;
+        }
+        // Bullet
+        if (/^[\-•▸*]\s+/.test(line) || /^\d+\.\s+/.test(line)) {
+            bullets.push(line.replace(/^[\-•▸*\d]+\.?\s+/, ''));
+            return;
+        }
+        // Follow-up question  — last question line after bullets, or labelled
+        if (/\*?\*?follow.?up\*?\*?/i.test(line)) {
+            followup = line.replace(/\*?\*?follow.?up\*?\*?[:\s]*/i, '').trim();
+            return;
+        }
+        // Solo question at the end (last non-empty line ends with ?)
+        if (i === lines.length - 1 && line.endsWith('?') && !disclaimer) {
+            followup = line;
+            return;
+        }
+        // Hook (first meaningful line)
+        if (!hook && bodyLines.length === 0 && bullets.length === 0) {
+            hook = applyBold(line);
+        } else {
+            bodyLines.push(applyBold(line));
+        }
+    });
+
+    let html = '';
+    if (hook)               html += `<p class="aria-hook">${hook}</p>`;
+    if (bodyLines.length)   html += `<p class="aria-body">${bodyLines.join(' ')}</p>`;
+    if (bullets.length) {
+        html += '<ul class="aria-bullets">';
+        bullets.forEach(b => { html += `<li>${applyBold(b)}</li>`; });
+        html += '</ul>';
+    }
+    if (followup)    html += `<div class="aria-followup">💭 ${applyBold(followup)}</div>`;
+    if (disclaimer)  html += `<p class="aria-disclaimer">${disclaimer}</p>`;
+
+    // Fallback: if nothing parsed well, just show formatted text
+    if (!html) html = `<p class="aria-body">${applyBold(escapeHtml(text))}</p>`;
+    return html;
+}
+
+function applyBold(text) {
+    // Convert **text** to <strong> and escape HTML for the rest
+    return escapeHtml(text)
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+// ============================================================
+//  CALCULATOR
+// ============================================================
+let calcDebounce = null;
+
+function initCalculator() {
+    updateDisplays();
+    updateCalculator();
+}
+
+function onSliderChange() {
+    updateDisplays();
+    clearTimeout(calcDebounce);
+    calcDebounce = setTimeout(updateCalculator, 300);
+}
+
+function updateDisplays() {
+    const m = parseInt(document.getElementById('calc-monthly').value);
+    const r = parseFloat(document.getElementById('calc-return').value);
+    const y = parseInt(document.getElementById('calc-years').value);
+    document.getElementById('monthly-display').textContent = `₹${m.toLocaleString()}`;
+    document.getElementById('return-display').textContent  = `${r}%`;
+    document.getElementById('years-display').textContent   = `${y} yrs`;
+}
+
+async function updateCalculator() {
+    const monthly = parseInt(document.getElementById('calc-monthly').value);
+    const ret     = parseFloat(document.getElementById('calc-return').value);
+    const years   = parseInt(document.getElementById('calc-years').value);
+
+    try {
+        const res  = await fetch('/api/calculator', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ monthly_amount: monthly, annual_return: ret, years })
+        });
+        const data = await res.json();
+
+        fetch('/api/user/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                calculator_inputs: {
+                    monthly_amount: monthly,
+                    annual_return: ret,
+                    years: years,
+                }
+            })
+        }).catch(() => {});
+
+        // Summary stats
+        document.getElementById('summary-invested').textContent  = data.summary.total_invested;
+        document.getElementById('summary-portfolio').textContent = data.summary.portfolio_value;
+        document.getElementById('summary-gain').textContent      = data.summary.compounding_gain + ` (${data.summary.gain_percentage})`;
+
+        drawGrowthChart(data.chart);
+        drawDelayChart(data.delay_chart);
+        updateDelayInsight(data.delay_chart);
+    } catch (err) {
+        console.error('Calculator error:', err);
+    }
+}
+
+function drawGrowthChart(c) {
+    const ctx = document.getElementById('growth-chart').getContext('2d');
+    if (growthChart) growthChart.destroy();
+
+    growthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: c.years,
+            datasets: [
+                {
+                    label: 'Portfolio Value',
+                    data: c.portfolio,
+                    borderColor: '#A78BFA',
+                    backgroundColor: 'rgba(167,139,250,0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 5
+                },
+                {
+                    label: 'Amount Invested',
+                    data: c.invested,
+                    borderColor: '#5C5280',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 1.5,
+                    borderDash: [5, 4],
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: chartOptions('₹')
+    });
+}
+
+function drawDelayChart(d) {
+    const ctx = document.getElementById('delay-chart').getContext('2d');
+    if (delayChart) delayChart.destroy();
+
+    delayChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: d.years,
+            datasets: [
+                {
+                    label: 'Start Today',
+                    data: d.scenario_a,
+                    borderColor: '#34D399',
+                    backgroundColor: 'rgba(52,211,153,0.08)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 5
+                },
+                {
+                    label: 'Start After 5 Yrs',
+                    data: d.scenario_b,
+                    borderColor: '#F87171',
+                    backgroundColor: 'rgba(248,113,113,0.07)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2,
+                    borderDash: [6, 3],
+                    pointRadius: 0,
+                    pointHoverRadius: 5
+                }
+            ]
+        },
+        options: chartOptions('₹')
+    });
+
+    document.getElementById('delay-final-a').textContent    = d.final_a;
+    document.getElementById('delay-final-b').textContent    = d.final_b;
+    document.getElementById('delay-wealth-lost').textContent = d.wealth_lost;
+}
+
+function updateDelayInsight(d) {
+    const insight = document.getElementById('delay-insight');
+    const text    = document.getElementById('delay-insight-text');
+    text.textContent = `Starting ${d.delay_years} years earlier could add ${d.wealth_lost} to your future savings. That's the silent power of compounding — it doesn't just grow money, it punishes delay.`;
+    insight.style.display = 'flex';
+}
+
+function chartOptions(prefix) {
+    return {
+        responsive: true,
+        maintainAspectRatio: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: {
+                labels: { color: '#9B8EC4', padding: 16, usePointStyle: true, pointStyleWidth: 12, font: { size: 12 } }
+            },
+            tooltip: {
+                backgroundColor: '#181530',
+                borderColor: 'rgba(124,58,237,0.3)',
+                borderWidth: 1,
+                titleColor: '#EDE9FF',
+                bodyColor: '#9B8EC4',
+                callbacks: {
+                    label: ctx => ` ${ctx.dataset.label}: ₹${Math.round(ctx.raw).toLocaleString('en-IN')}`
+                }
+            }
+        },
+        scales: {
+            y: {
+                ticks: {
+                    color: '#5C5280',
+                    font: { size: 11 },
+                    callback: v => v >= 1e5 ? `₹${(v/1e5).toFixed(1)}L` : v >= 1e3 ? `₹${(v/1e3).toFixed(0)}K` : `₹${v}`
+                },
+                grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            x: {
+                ticks: { color: '#5C5280', font: { size: 11 } },
+                grid: { color: 'rgba(255,255,255,0.04)' }
+            }
+        }
+    };
+}
+
+// ============================================================
+//  UTILITY
+// ============================================================
+function escapeHtml(t) {
+    return String(t)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+</script>
+{% endblock %}

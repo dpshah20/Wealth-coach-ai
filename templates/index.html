@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}ARIA — Login or Signup{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center p-4" style="padding-top: 2.5rem; padding-bottom: 2.5rem;">
+    <div class="text-center mb-6 fade-in">
+        <div style="font-size: 2.8rem; font-weight: 800;" class="brand-gradient">ARIA</div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.25rem;">AI Wealth Mentor</p>
+    </div>
+
+    <div id="auth-card" class="card fade-in" style="width: 100%; max-width: 560px; padding: 1.5rem;">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <button class="tab-btn active" id="signup-tab" onclick="switchAuth('signup')">Signup</button>
+            <button class="tab-btn" id="login-tab" onclick="switchAuth('login')">Login</button>
+        </div>
+
+        <form id="signup-form" onsubmit="handleSignup(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 0.7rem;">
+                <input class="input-base" name="first_name" placeholder="First name" required />
+                <input class="input-base" name="surname" placeholder="Surname" required />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 0.7rem;">
+                <input class="input-base" type="number" min="18" max="100" name="age" placeholder="Age" required />
+                <input class="input-base" type="email" name="email" placeholder="Email" required />
+            </div>
+            <input class="input-base" type="password" name="password" placeholder="Password (min 6 chars)" required style="margin-bottom: 0.9rem;" />
+            <button class="btn-primary" type="submit" style="width: 100%;">Create Account & Continue</button>
+        </form>
+
+        <form id="login-form" onsubmit="handleLogin(event)" style="display: none;">
+            <input class="input-base" type="email" name="email" placeholder="Email" required style="margin-bottom: 0.7rem;" />
+            <input class="input-base" type="password" name="password" placeholder="Password" required style="margin-bottom: 0.9rem;" />
+            <button class="btn-primary" type="submit" style="width: 100%;">Login & Continue</button>
+        </form>
+
+        <p id="auth-error" style="display:none; margin-top: 0.8rem; color: #F87171; font-size: 0.82rem;"></p>
+    </div>
+
+    <div id="onboard-card" class="card fade-in" style="display:none; width: 100%; max-width: 560px; padding: 0; overflow: hidden;">
+        <div id="onboard-messages" style="padding: 1.4rem; min-height: 320px; max-height: 55vh; overflow-y: auto;"></div>
+
+        <div id="risk-choices" style="display:none; padding: 0 1.4rem 0.8rem; gap: 0.6rem; flex-wrap: wrap;">
+            <button class="risk-btn" data-risk="low" data-label="Panic-sell" onclick="handleRiskChoice(this)">😰 Panic-sell</button>
+            <button class="risk-btn" data-risk="medium" data-label="Hold" onclick="handleRiskChoice(this)">😌 Hold</button>
+            <button class="risk-btn" data-risk="high" data-label="Buy more" onclick="handleRiskChoice(this)">🤑 Buy more</button>
+        </div>
+
+        <div id="input-area" style="border-top: 1px solid var(--border); padding: 1rem; display: flex; gap: 0.5rem;">
+            <input id="onboard-input" class="input-base" placeholder="Type your answer..." onkeypress="if(event.key==='Enter') handleUserInput()" />
+            <button id="send-btn" class="btn-primary" onclick="handleUserInput()">Send</button>
+        </div>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 0.72rem; margin-top: 1.2rem; text-align: center;">
+        Educational tool only · Not a registered financial advisor
+    </p>
+</div>
+
+<style>
+    .risk-btn {
+        background: rgba(124, 58, 237, 0.08);
+        border: 1px solid rgba(124, 58, 237, 0.25);
+        color: var(--purple-light);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        font-family: inherit;
+    }
+    #onboard-messages::-webkit-scrollbar { width: 4px; }
+    #onboard-messages::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.25); border-radius: 4px; }
+</style>
+
+<script>
+const state = {
+    first_name: '',
+    step: 0,
+    investment_goals: '',
+    investment_horizon: 10,
+    risk_tolerance: 'medium',
+    monthly_surplus: 5000
+};
+
+function switchAuth(mode) {
+    const isSignup = mode === 'signup';
+    document.getElementById('signup-form').style.display = isSignup ? 'block' : 'none';
+    document.getElementById('login-form').style.display = isSignup ? 'none' : 'block';
+    document.getElementById('signup-tab').className = 'tab-btn' + (isSignup ? ' active' : '');
+    document.getElementById('login-tab').className = 'tab-btn' + (!isSignup ? ' active' : '');
+    showAuthError('');
+}
+
+function showAuthError(msg) {
+    const el = document.getElementById('auth-error');
+    if (!msg) {
+        el.style.display = 'none';
+        el.textContent = '';
+        return;
+    }
+    el.style.display = 'block';
+    el.textContent = msg;
+}
+
+async function handleSignup(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    const out = await res.json();
+    if (out.status !== 'success') {
+        showAuthError(out.message || 'Signup failed');
+        return;
+    }
+    if (!out.needs_onboarding) {
+        window.location.href = '/dashboard';
+        return;
+    }
+    startOnboarding(out.user || {});
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    const out = await res.json();
+    if (out.status !== 'success') {
+        showAuthError(out.message || 'Login failed');
+        return;
+    }
+    if (!out.needs_onboarding) {
+        window.location.href = '/dashboard';
+        return;
+    }
+    startOnboarding(out.user || {});
+}
+
+function startOnboarding(user) {
+    state.first_name = user.first_name || 'there';
+    document.getElementById('auth-card').style.display = 'none';
+    document.getElementById('onboard-card').style.display = 'block';
+    showARIAWithDelay(`Hi ${state.first_name}! I'm ARIA 👋\n\nBefore we set things up, what usually happens to your extra money at month-end?`, 450);
+}
+
+function ariaMsg(html) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-aria';
+    wrap.innerHTML = `<div class="aria-avatar">✨</div><div class="bubble" style="font-size:0.92rem;line-height:1.65;">${html.replace(/\n/g, '<br>')}</div>`;
+    return wrap;
+}
+
+function userBubble(text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-user';
+    wrap.innerHTML = `<div class="bubble">${escapeHtml(text)}</div>`;
+    return wrap;
+}
+
+function typingIndicator() {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-aria';
+    wrap.id = 'typing';
+    wrap.innerHTML = `<div class="aria-avatar">✨</div><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    return wrap;
+}
+
+function appendMsg(el) {
+    const box = document.getElementById('onboard-messages');
+    box.appendChild(el);
+    setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+}
+
+function setInputDisabled(disabled, placeholder = 'Type your answer...') {
+    const inp = document.getElementById('onboard-input');
+    const btn = document.getElementById('send-btn');
+    inp.disabled = disabled;
+    btn.disabled = disabled;
+    inp.placeholder = placeholder;
+}
+
+function parseRiskFromText(text) {
+    const value = text.toLowerCase();
+    if (/panic|sell|safe|safety|withdraw|exit/.test(value)) return 'low';
+    if (/buy more|buy|cheaper|dip|opportun|add/.test(value)) return 'high';
+    if (/hold|wait|keep|stay|continue|invested/.test(value)) return 'medium';
+    return null;
+}
+
+async function showARIAWithDelay(html, delay = 650) {
+    if (!html) return;
+    appendMsg(typingIndicator());
+    await new Promise(r => setTimeout(r, delay));
+    const t = document.getElementById('typing');
+    if (t) t.remove();
+    appendMsg(ariaMsg(html));
+}
+
+function getStep1Reply(answer) {
+    const a = answer.toLowerCase();
+    if (/sav|kept|invest|set aside/.test(a)) return `Great habit. Saving is step one; now we'll make that money work for you.`;
+    if (/spent|spend|shopping|food|fun/.test(a)) return `Very common early-career pattern. Even small monthly investing can create large long-term outcomes.`;
+    if (/disappear|gone|no idea|vanish/.test(a)) return `That happens to many people. A simple monthly plan can fix this quickly.`;
+    return `Thanks for sharing. Let's turn that into a clear investing plan.`;
+}
+
+function getStep4Reply(risk) {
+    const map = {
+        low: `Understood. You value stability first.`,
+        medium: `Good approach. Long-term investors usually stay consistent through ups and downs.`,
+        high: `Strong risk appetite. We'll still stay disciplined while aiming for growth.`
+    };
+    return map[risk] || map.medium;
+}
+
+async function handleUserInput() {
+    const inp = document.getElementById('onboard-input');
+    const text = inp.value.trim();
+    if (!text || inp.disabled) return;
+    inp.value = '';
+    appendMsg(userBubble(text));
+    setInputDisabled(true, 'ARIA is thinking...');
+
+    if (state.step === 0) {
+        await showARIAWithDelay(getStep1Reply(text), 800);
+        await showARIAWithDelay(`What's one financial goal you want this money to help you achieve?`, 550);
+        state.step = 1;
+        setInputDisabled(false, 'Example: home down payment');
+        return;
+    }
+
+    if (state.step === 1) {
+        state.investment_goals = text;
+        await showARIAWithDelay(`Nice goal. Roughly how many years can you stay invested before needing this money?`, 650);
+        state.step = 2;
+        setInputDisabled(false, 'Example: 10 years');
+        return;
+    }
+
+    if (state.step === 2) {
+        state.investment_horizon = Math.min(Math.max(parseInt(text.replace(/\D/g, '')) || 10, 1), 30);
+        await showARIAWithDelay(`Got it. If your portfolio drops 20% next month, would you panic-sell, hold, or buy more?`, 650);
+        state.step = 3;
+        document.getElementById('risk-choices').style.display = 'flex';
+        setInputDisabled(false, 'Type panic-sell / hold / buy more');
+        return;
+    }
+
+    if (state.step === 3) {
+        const risk = parseRiskFromText(text);
+        if (!risk) {
+            await showARIAWithDelay(`Please type panic-sell, hold, or buy more, or tap one of the buttons.`, 400);
+            setInputDisabled(false, 'Type panic-sell / hold / buy more');
+            return;
+        }
+        state.risk_tolerance = risk;
+        document.getElementById('risk-choices').style.display = 'none';
+        await showARIAWithDelay(getStep4Reply(risk), 600);
+        await showARIAWithDelay(`Last one: how much can you invest every month?`, 450);
+        state.step = 4;
+        setInputDisabled(false, 'Example: 5000');
+        return;
+    }
+
+    if (state.step === 4) {
+        state.monthly_surplus = Math.min(Math.max(parseInt(text.replace(/\D/g, '')) || 2000, 100), 500000);
+        setInputDisabled(true, 'Setting things up...');
+        await showARIAWithDelay(`Perfect. I'm setting up your dashboard now.`, 500);
+        await submitOnboarding();
+    }
+}
+
+async function handleRiskChoice(btn) {
+    const risk = btn.dataset.risk;
+    appendMsg(userBubble(btn.dataset.label));
+    state.risk_tolerance = risk;
+    document.getElementById('risk-choices').style.display = 'none';
+    await showARIAWithDelay(getStep4Reply(risk), 500);
+    await showARIAWithDelay(`Last one: how much can you invest every month?`, 450);
+    state.step = 4;
+    setInputDisabled(false, 'Example: 5000');
+}
+
+async function submitOnboarding() {
+    const res = await fetch('/api/onboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            monthly_surplus: state.monthly_surplus,
+            risk_tolerance: state.risk_tolerance,
+            investment_goals: state.investment_goals,
+            investment_horizon: state.investment_horizon
+        })
+    });
+    const out = await res.json();
+    if (out.status === 'success') {
+        window.location.href = '/dashboard';
+        return;
+    }
+    await showARIAWithDelay(`I hit an issue: ${escapeHtml(out.message || 'Please retry')}`, 400);
+    setInputDisabled(false);
+}
+
+function escapeHtml(t) {
+    return String(t)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const profileRes = await fetch('/api/user/profile');
+    if (profileRes.ok) {
+        const data = await profileRes.json();
+        startOnboarding(data.profile || {});
+    }
+});
+</script>
+{% endblock %}

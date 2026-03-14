@@ -1,0 +1,239 @@
+<!-- Progress Tracker Component -->
+<div id="progress-container" class="progress-section">
+  <div class="progress-header">
+    <h3 class="text-lg font-semibold gradient-text">📊 Your Progress</h3>
+    <p class="text-sm text-muted">Track your learning journey</p>
+  </div>
+
+  <div class="progress-stats">
+    <div class="stat-card">
+      <div class="stat-value" id="completion-percentage">0%</div>
+      <div class="stat-label">Complete</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="completed-count">0</div>
+      <div class="stat-label">Topics Done</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="in-progress-count">0</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="total-count">0</div>
+      <div class="stat-label">Total Topics</div>
+    </div>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar">
+      <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <div class="milestones-section">
+    <h4 class="milestones-title">🏆 Milestones</h4>
+    <div class="milestones-list" id="milestones-list">
+      <!-- Milestones will be loaded here -->
+    </div>
+  </div>
+
+  <div class="topics-section">
+    <h4 class="topics-title">📚 Learning Topics</h4>
+    <div class="topics-list" id="topics-list">
+      <!-- Topics will be loaded here -->
+    </div>
+  </div>
+</div>
+
+<style>
+.progress-section {
+  background: var(--card-bg);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.progress-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 201, 177, 0.1);
+}
+
+.progress-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: rgba(0, 201, 177, 0.05);
+  border: 1px solid rgba(0, 201, 177, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.progress-bar-container {
+  margin-bottom: 2rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: rgba(139, 161, 192, 0.2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--gold));
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.milestones-section,
+.topics-section {
+  margin-bottom: 2rem;
+}
+
+.milestones-title,
+.topics-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.milestones-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.milestone-item {
+  background: rgba(245, 166, 35, 0.05);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.milestone-item.achieved {
+  background: rgba(0, 201, 177, 0.05);
+  border-color: rgba(0, 201, 177, 0.3);
+}
+
+.milestone-icon {
+  font-size: 1.5rem;
+}
+
+.milestone-content h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.milestone-content p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.topics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.topic-item {
+  background: rgba(10, 22, 40, 0.3);
+  border: 1px solid rgba(0, 201, 177, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.topic-item:hover {
+  border-color: rgba(0, 201, 177, 0.3);
+  background: rgba(0, 201, 177, 0.05);
+}
+
+.topic-content {
+  flex: 1;
+}
+
+.topic-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.topic-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.topic-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-completed {
+  color: var(--teal);
+}
+
+.status-in-progress {
+  color: var(--gold);
+}
+
+.status-pending {
+  color: var(--muted);
+}
+
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+}
+
+.status-completed .status-icon {
+  background: rgba(0, 201, 177, 0.2);
+  color: var(--teal);
+}
+
+.status-in-progress .status-icon {
+  background: rgba(245, 166, 35, 0.2);
+  color: var(--gold);
+}
+
+.status-pending .status-icon {
+  background: rgba(139, 161, 192, 0.2);
+  color: var(--muted);
+}
+</style>

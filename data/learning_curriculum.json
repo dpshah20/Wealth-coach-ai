@@ -1,0 +1,230 @@
+{
+  "curriculum": {
+    "foundations": {
+      "name": "Investment Foundations",
+      "description": "Build your financial knowledge base",
+      "icon": "🧱",
+      "topics": [
+        {
+          "id": "emergency_fund",
+          "title": "Emergency Fund Basics",
+          "description": "Build a 3-6 month safety net",
+          "duration": "15 mins",
+          "difficulty": "Beginner",
+          "icon": "🛡️",
+          "content": "An emergency fund is your financial safety net. Aim for 3-6 months of expenses. Keep it in liquid, low-risk options like savings accounts or liquid funds."
+        },
+        {
+          "id": "understanding_compounding",
+          "title": "Power of Compounding",
+          "description": "How small investments grow into wealth over time",
+          "duration": "15 mins",
+          "difficulty": "Beginner",
+          "icon": "✨",
+          "content": "Compound interest is 'interest on interest'. Start early - even ₹1,000/month at 12% returns becomes ₹1.2 lakhs in 10 years, ₹7.8 lakhs in 20 years!"
+        },
+        {
+          "id": "fixed_deposits",
+          "title": "Fixed Deposits (FD)",
+          "description": "Safe, guaranteed returns with banks",
+          "duration": "15 mins",
+          "difficulty": "Beginner",
+          "icon": "🏦",
+          "content": "FDs offer guaranteed returns (5-7% typically). Safe for short-term goals. Consider tax-saving FDs for additional benefits. Compare rates across banks."
+        }
+      ]
+    },
+    "getting_started": {
+      "name": "Getting Started with Investing",
+      "description": "Your first steps into the investment world",
+      "icon": "🚀",
+      "topics": [
+        {
+          "id": "sip_basics",
+          "title": "Understanding SIP",
+          "description": "Systematic Investment Plan - invest regularly",
+          "duration": "20 mins",
+          "difficulty": "Beginner",
+          "icon": "📈",
+          "content": "SIP is like a gym membership for your money. Invest fixed amounts monthly, regardless of market conditions. This 'rupee-cost averaging' reduces risk and removes timing decisions."
+        },
+        {
+          "id": "mutual_funds_101",
+          "title": "Mutual Funds 101",
+          "description": "Professional money management for investors",
+          "duration": "25 mins",
+          "difficulty": "Beginner",
+          "icon": "💼",
+          "content": "Mutual funds pool money from many investors to invest in stocks/bonds. Fund managers make investment decisions. Types: Equity (stocks), Debt (bonds), Hybrid (both)."
+        },
+        {
+          "id": "risk_vs_return",
+          "title": "Risk vs Return",
+          "description": "Understanding the relationship between risk and rewards",
+          "duration": "20 mins",
+          "difficulty": "Intermediate",
+          "icon": "⚖️",
+          "content": "Higher returns come with higher risk. Conservative investors (low risk) get 5-7% returns. Aggressive investors (high risk) can get 12-15% long-term returns. Know your risk appetite!"
+        }
+      ]
+    },
+    "building_strategy": {
+      "name": "Building Your Strategy",
+      "description": "Create a personalized investment approach",
+      "icon": "🎯",
+      "topics": [
+        {
+          "id": "diversification",
+          "title": "Diversification Strategy",
+          "description": "Don't put all eggs in one basket",
+          "duration": "20 mins",
+          "difficulty": "Intermediate",
+          "icon": "🌈",
+          "content": "Diversification spreads risk across different assets. Mix equity funds, debt funds, gold. Different sectors, market caps, geographies. Reduces volatility while maintaining returns."
+        },
+        {
+          "id": "goal_based_investing",
+          "title": "Goal-Based Investing",
+          "description": "Invest with specific financial goals in mind",
+          "duration": "20 mins",
+          "difficulty": "Intermediate",
+          "icon": "🎯",
+          "content": "Different goals need different strategies. Short-term (1-3 years): FDs/Liquid funds. Medium-term (3-7 years): Balanced funds. Long-term (7+ years): Equity savings."
+        },
+        {
+          "id": "market_cycles",
+          "title": "Market Cycles & Patience",
+          "description": "Markets go up and down - stay calm",
+          "duration": "20 mins",
+          "difficulty": "Intermediate",
+          "icon": "📊",
+          "content": "Markets have cycles: Bull (up) and Bear (down) markets. Historical data shows markets recover. Long-term investors benefit from staying invested through volatility."
+        }
+      ]
+    },
+    "advanced_concepts": {
+      "name": "Advanced Concepts",
+      "description": "Fine-tune your investment approach",
+      "icon": "🧠",
+      "topics": [
+        {
+          "id": "elss_funds",
+          "title": "ELSS Funds",
+          "description": "Tax-saving mutual funds with equity exposure",
+          "duration": "20 mins",
+          "difficulty": "Intermediate",
+          "icon": "📋",
+          "content": "ELSS funds offer tax deduction under 80C (up to ₹1.5 lakh). 3-year lock-in period. Equity-oriented, potential for higher returns than traditional tax-saving options."
+        },
+        {
+          "id": "index_etf_funds",
+          "title": "Index Funds & ETFs",
+          "description": "Low-cost passive investing",
+          "duration": "25 mins",
+          "difficulty": "Intermediate",
+          "icon": "📉",
+          "content": "Index funds/ETFs track market indices like Nifty 50. Low expense ratios (0.1-0.5%). No fund manager bias. Good for long-term, buy-and-hold investors."
+        },
+        {
+          "id": "investment_costs",
+          "title": "Cost of Investing",
+          "description": "Understanding fees and their impact",
+          "duration": "15 mins",
+          "difficulty": "Intermediate",
+          "icon": "💰",
+          "content": "Key costs: Expense ratio (0.5-2%), Exit load (if redeemed early), Transaction charges. Higher costs reduce your returns. Compare before investing."
+        }
+      ]
+    }
+  },
+  "learning_paths": {
+    "conservative_beginner": {
+      "name": "Safe & Steady Path",
+      "description": "Perfect for risk-averse beginners",
+      "icon": "🛡️",
+      "estimated_time": "75 mins",
+      "topics": ["emergency_fund", "fixed_deposits", "understanding_compounding", "sip_basics", "mutual_funds_101"],
+      "difficulty": "Beginner",
+      "risk_profile": "Conservative"
+    },
+    "balanced_beginner": {
+      "name": "Balanced Growth Path",
+      "description": "Ideal for most first-time investors",
+      "icon": "⚖️",
+      "estimated_time": "120 mins",
+      "topics": ["emergency_fund", "understanding_compounding", "sip_basics", "mutual_funds_101", "risk_vs_return", "diversification"],
+      "difficulty": "Beginner to Intermediate",
+      "risk_profile": "Moderate"
+    },
+    "aggressive_beginner": {
+      "name": "High Growth Path",
+      "description": "For those willing to take calculated risks",
+      "icon": "🚀",
+      "estimated_time": "150 mins",
+      "topics": ["emergency_fund", "understanding_compounding", "sip_basics", "mutual_funds_101", "risk_vs_return", "diversification", "market_cycles", "index_etf_funds"],
+      "difficulty": "Intermediate",
+      "risk_profile": "Aggressive"
+    },
+    "experienced_investor": {
+      "name": "Advanced Strategy Path",
+      "description": "Refine your investment approach",
+      "icon": "🎯",
+      "estimated_time": "90 mins",
+      "topics": ["goal_based_investing", "market_cycles", "elss_funds", "index_etf_funds", "investment_costs"],
+      "difficulty": "Intermediate to Advanced",
+      "risk_profile": "Any"
+    }
+  },
+  "milestones": [
+    {
+      "id": "first_topic",
+      "name": "Learning Starter",
+      "description": "Completed your first topic",
+      "icon": "🌱",
+      "requirement": 1,
+      "reward": "Basic understanding of personal finance"
+    },
+    {
+      "id": "foundation_complete",
+      "name": "Foundation Builder",
+      "description": "Completed foundation topics",
+      "icon": "🧱",
+      "requirement": 3,
+      "reward": "Ready to start investing safely"
+    },
+    {
+      "id": "strategy_ready",
+      "name": "Strategy Ready",
+      "description": "Completed 6 core topics",
+      "icon": "🎯",
+      "requirement": 6,
+      "reward": "Can create a basic investment plan"
+    },
+    {
+      "id": "wealth_builder",
+      "name": "Wealth Builder",
+      "description": "Completed 10 topics",
+      "icon": "💎",
+      "requirement": 10,
+      "reward": "Advanced investment knowledge"
+    },
+    {
+      "id": "master_investor",
+      "name": "Master Investor",
+      "description": "Completed all topics",
+      "icon": "🏆",
+      "requirement": 12,
+      "reward": "Comprehensive investment expertise"
+    }
+  ],
+  "quick_tips": [
+    "Start with emergency fund before investing",
+    "Invest regularly through SIPs",
+    "Diversify across different asset classes",
+    "Stay invested for long-term goals",
+    "Review portfolio annually, not daily",
+    "Keep investment costs low",
+    "Invest only what you can afford to lose",
+    "Learn continuously about markets"
+  ]
+}
