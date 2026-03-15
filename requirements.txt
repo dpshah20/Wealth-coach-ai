@@ -5,3 +5,4 @@ google-genai==1.67.0
 requests==2.31.0
 Werkzeug==2.3.7
 gunicorn==21.2.0
+psycopg2-binary==2.9.10
